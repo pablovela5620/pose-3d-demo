@@ -22,7 +22,7 @@ Makes use of
 Currently only works on linux with an Nvidia GPU
 Make sure you have the [Pixi](https://pixi.sh/latest/#installation) package manager installed
 ```bash
-git clone $POSE3D_REPO
+git clone https://github.com/pablovela5620/pose-3d-demo.git
 cd pose-3d-demo
 pixi run post-install
 ```
