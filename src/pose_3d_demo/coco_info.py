@@ -1,0 +1,43 @@
+COCO_17_LINKS = [
+    (15, 13),
+    (13, 11),
+    (16, 14),
+    (14, 12),
+    (11, 12),
+    (5, 11),
+    (6, 12),
+    (5, 6),
+    (5, 7),
+    (6, 8),
+    (7, 9),
+    (8, 10),
+    (1, 2),
+    (0, 1),
+    (0, 2),
+    (1, 3),
+    (2, 4),
+    (3, 5),
+    (4, 6),
+]
+
+COCO_17_ID2NAME: dict[int, str] = {
+    0: "nose",
+    1: "left_eye",
+    2: "right_eye",
+    3: "left_ear",
+    4: "right_ear",
+    5: "left_shoulder",
+    6: "right_shoulder",
+    7: "left_elbow",
+    8: "right_elbow",
+    9: "left_wrist",
+    10: "right_wrist",
+    11: "left_hip",
+    12: "right_hip",
+    13: "left_knee",
+    14: "right_knee",
+    15: "left_ankle",
+    16: "right_ankle",
+}
+
+COCO_17_IDS: list[int] = [int(key) for key in COCO_17_ID2NAME]

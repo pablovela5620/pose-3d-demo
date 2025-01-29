@@ -1,0 +1,109 @@
+[project]
+authors = [{ name = "pablovela5620", email = "pablovela5620@gmail.com" }]
+description = "Add a short description here"
+name = "pose-3d-demo"
+requires-python = ">= 3.11"
+version = "0.1.0"
+dependencies = ["mediapipe>=0.10.20,<0.11", "mmcv-lite>=2.2.0,<3"]
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.pixi.project]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.activation]
+scripts = [".pixi.sh"]
+
+[tool.pixi.system-requirements]
+cuda = "12.0"
+
+[tool.pixi.pypi-dependencies]
+pose_3d_demo = { path = ".", editable = true }
+simplecv = { git = "https://github.com/pablovela5620/simplecv.git" }
+[tool.pixi.tasks]
+post-install = { cmd = "python -m pip install inference-gpu", description = "Run postinstall script (installs gpu version of supervision)", depends-on = [
+    "_unzip-example-easymocap-data",
+    "_download-mp-model",
+], outputs = [
+    ".pixi/envs/default/bin/inference",
+] }
+triangulate-example = { cmd = "python tools/run_triangulation.py --data-dir data/street_dance --camera-subset  1 2 3 4 5 6", depends-on = [
+    "post-install",
+], description = "Run 3D pose triangulation on example multi-view video" }
+video-example = { cmd = "python tools/run_pose_from_video.py --video-path data/street_dance/videos/01.mp4", depends-on = [
+    "post-install",
+], description = "Run 2D pose estimation on example video" }
+
+[tool.pixi.tasks._download-example-easymocap-data]
+cmd = """
+    test -e data/$DATA_TYPE.zip
+    || (
+        huggingface-cli download pablovela5620/easymocap-example-data \
+        $DATA_TYPE.zip --repo-type dataset \
+        --local-dir data/
+    )
+    """
+outputs = ["data/$DATA_TYPE.zip"]
+description = "Downloads example EasyMoCap dataset"
+
+[tool.pixi.tasks._unzip-example-easymocap-data]
+cmd = """
+    test -e data/$DATA_TYPE
+    || (
+        unzip data/$DATA_TYPE.zip -d data/
+    )
+    """
+depends-on = ["_download-example-easymocap-data"]
+outputs = ["data/$DATA_TYPE"]
+description = "Downloads example EasyMoCap dataset"
+
+[tool.pixi.tasks._download-mp-model]
+cmd = """
+    test -e data/pose_landmarker_heavy.task \
+    || (
+        curl -L --retry 3 --retry-delay 3 --connect-timeout 30 \
+        https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/latest/pose_landmarker_heavy.task \
+        --output data/pose_landmarker_heavy.task
+    )
+    """
+
+description = "Downloads MediaPipe pose landmark detection model"
+outputs = ["data/pose_landmarker_heavy.task"]
+
+[tool.pixi.dependencies]
+python = "==3.11"
+numpy = "<2"
+rerun-sdk = ">=0.21.0,<0.22"
+huggingface_hub = ">=0.27.1,<0.28"
+tyro = ">=0.9.1,<0.10"
+supervision = ">=0.25.1,<0.26"
+pytorch-gpu = "*"
+pip = ">=24.3.1,<25"
+cuda-version = "12.6.*"
+# pip = ">=24.3.1,<25"
+
+[tool.ruff]
+line-length = 120
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
+
+ignore = [
+    "E501", # Line too long.
+    "F722", # Forward annotation false positive from jaxtyping. Should be caught by pyright.
+    "F821", # Forward annotation false positive from jaxtyping. Should be caught by pyright.
+]
